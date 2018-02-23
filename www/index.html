@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+        <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+        <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+        <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+        <script src="key.js"></script>  
+        <script src="cors.js"></script>
+        <script src="Restaurant.js"></script>
+       
+        <title>Restaurant Row</title>
+        <style>
+            #header, #footer {
+                text-align: center;
+            }            
+        </style>
+    </head>
+    <body>
+        <div data-role="page">
+            <div data-role="header" id="header">Restaurant Row</div>
+            <div role="main" class="ui-content">
+                <div id="result"></div>
+            </div>
+            <div data-role="footer" id="footer">Copyright &copy;2018</div>
+        </div>
+
+       <script type="text/javascript" src="cordova.js"></script>
+        <script>
+        var restaurantList = new Array();
+        
+       // document.addEventListener("deviceready", onDeviceReady, false);
+        onDeviceReady();
+            
+        function onDeviceReady() {
+            navigator.geolocation.getCurrentPosition(onSuccess, onError, [{ maximumAge: 3000, timeout: 5000, enableHighAccuracy: true}]);
+        }   
+            
+        function onSuccess(position) {
+            var lat = position.coords.latitude;
+            var long = position.coords.longitude;
+            getLocalRestaurants(lat,long);
+        }
+            
+        function onError(e) {
+            console.log(e.message);
+        }
+            
+        function getLocalRestaurants(lat,long)
+        {
+            var URL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=" + lat + "," + long + "&radius=500&types=food&key=" + key;
+            var xhr = createCORSRequest('GET', URL);
+            xhr.onload = function(){
+                var restJSON = JSON.parse(xhr.responseText);
+                $.each(restJSON.results, function(i, entry)
+                {
+                    var restaurant = new Restaurant(entry.name, entry.vicinity, entry.rating, entry.price_level, entry.photos );
+                    restaurantList.push(restaurant);
+                });
+                showRestaurants();
+            }
+            
+            xhr.onerror = function(e){
+                console.log("Error: ");
+                console.log(e);
+            }
+            xhr.send();
+           
+        }
+            
+        function showRestaurants()
+        {
+            var out = "<ul id='restView' data-role='listview'>";
+            $.each(restaurantList, function(i, entry){
+                out += "<li>" + getPhotoHTML(restaurantList[i].photo);
+                out += "<h2>" +  restaurantList[i].name + "</h2>";
+                out += "<p>" + restaurantList[i].location + "<br/>";
+                out += "Rating: " + restaurantList[i].rating + "<br/>";
+                out += "Price: " + price(restaurantList[i].priceLevel);
+                out += "</li>"
+            });
+            out += "</ul>";
+            console.log(out);
+            $("#result").html(out);
+            $("#restView").listview().listview( "refresh" );
+        }
+            
+        function getPhotoHTML(photo)
+        {
+            if(photo){
+            var URL = "https://maps.googleapis.com/maps/api/place/photo?maxwidth=200&photoreference="
+            URL += photo[0].photo_reference;
+            URL += "&key=" + key;
+            var imgHTML = "<img src='" + URL + "' />";
+            return imgHTML;
+            } else 
+            {
+                imgHTML = "<img src='rest.png' style='margin-top: 10px;'/>";
+                return imgHTML;
+            }
+        }
+            
+        function price(priceLevel)
+        {
+            var out="$";
+            for(var x=0; x < priceLevel; x++)
+            {
+                out += "$";
+            }
+            return out;
+        }
+        </script>
+    </body>
+</html>

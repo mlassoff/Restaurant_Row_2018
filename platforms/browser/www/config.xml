@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="tv.learntoprogram.restaurantRow" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0" xmlns:gap="http://phonegap.com/ns/1.0">
+    <name>Restaurant Row</name>
+    <description>
+        A blank PhoneGap app.
+    </description>
+    <author email="support@phonegap.com" href="http://phonegap.com">
+        Mark Lassoff
+    </author>
+    <content src="index.html" />
+    <access origin="*" />
+    <allow-navigation href="*" />
+    <meta content="&#xA;    default-src *; &#xA;    style-src * 'unsafe-inline'; &#xA;    script-src * 'unsafe-inline'; &#xA;    media-src *; img-src * data:;" http-equiv="Content-Security-Policy" />
+</widget>
